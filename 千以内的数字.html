@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>千以内数字探险 - 小小数学家</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none; /* 避免拖动时选中文字/图片，移动端更干净 */
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: linear-gradient(145deg, #fef7e8 0%, #fff3e0 100%);
+            font-family: 'Comic Neue', 'Comic Neue', 'Comic Sans MS', 'Chalkboard SE', 'Segoe UI Emoji', cursive, sans-serif;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* 主容器左右布局，响应式 */
+        .lesson-box {
+            max-width: 1400px;
+            width: 100%;
+            background: #fffffa;
+            border-radius: 72px;
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.08), 0 5px 12px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            transition: all 0.2s;
+        }
+
+        .flex-layout {
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        /* ========= 左侧知识点区域 ========= */
+        .knowledge-side {
+            flex: 1.2;
+            min-width: 260px;
+            background: #fffaf0;
+            padding: 28px 22px;
+            border-right: 4px solid #ffe2bc;
+        }
+
+        .knowledge-side h2 {
+            font-size: 1.9rem;
+            color: #f5a65a;
+            text-align: center;
+            background: #fff2e2;
+            border-radius: 60px;
+            padding: 12px 0;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 0 #ffdfb8;
+        }
+
+        .place-card {
+            background: #ffffffdb;
+            border-radius: 48px;
+            padding: 18px 12px;
+            margin: 20px 0;
+            text-align: center;
+            box-shadow: 0 8px 0 #ffe0b5;
+        }
+
+        .place-card h3 {
+            color: #dc7f2c;
+            font-size: 1.5rem;
+            margin-bottom: 12px;
+        }
+
+        .big-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            background: #ffefdb;
+            display: inline-block;
+            padding: 8px 24px;
+            border-radius: 60px;
+            color: #c2621a;
+            margin: 8px 0;
+        }
+
+        .digits-row {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin: 15px 0;
+        }
+
+        .digit-unit {
+            background: #ffe6ce;
+            border-radius: 40px;
+            padding: 8px 16px;
+            min-width: 85px;
+        }
+
+        .digit-unit .title {
+            font-size: 0.9rem;
+            color: #b45f2b;
+        }
+
+        .digit-unit .num {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #f58c2e;
+        }
+
+        .explain-list {
+            background: #fff1e0;
+            border-radius: 40px;
+            padding: 15px 20px;
+            margin-top: 15px;
+            list-style: none;
+        }
+
+        .explain-list li {
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.95rem;
+            color: #b4622a;
+        }
+
+        /* ========= 右侧游戏区 ========= */
+        .game-side {
+            flex: 2;
+            min-width: 300px;
+            padding: 26px 24px;
+            background: #fffef8;
+        }
+
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            flex-wrap: wrap;
+            margin-bottom: 18px;
+            border-bottom: 3px dashed #ffe0bb;
+            padding-bottom: 12px;
+        }
+
+        .game-header h3 {
+            font-size: 1.7rem;
+            color: #e27c2c;
+            background: #fff3e6;
+            padding: 4px 20px;
+            border-radius: 50px;
+        }
+
+        .score-panel {
+            background: #ffefda;
+            padding: 6px 18px;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: #b45a1a;
+        }
+
+        /* 当前挑战数字展示 */
+        .challenge-area {
+            background: #fff3e8;
+            border-radius: 60px;
+            padding: 18px;
+            text-align: center;
+            margin: 10px 0 20px;
+            box-shadow: 0 12px 0 #ffdfba;
+        }
+
+        .challenge-label {
+            font-size: 1.2rem;
+            color: #e28936;
+        }
+
+        .current-number {
+            font-size: 4.2rem;
+            font-weight: bold;
+            color: #f78b2c;
+            background: white;
+            display: inline-block;
+            padding: 10px 35px;
+            border-radius: 80px;
+            margin: 8px 0;
+            letter-spacing: 5px;
+            box-shadow: inset 0 -2px 0 #ffe0bb, 0 8px 12px rgba(0,0,0,0.05);
+        }
+
+        /* 三个数位槽位 */
+        .slots-group {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            flex-wrap: wrap;
+            margin: 35px 0 25px;
+        }
+
+        .slot {
+            background: #fff7ed;
+            border-radius: 56px;
+            width: 140px;
+            padding: 18px 8px;
+            text-align: center;
+            border: 3px solid #ffd9ae;
+            transition: all 0.1s;
+            box-shadow: 0 10px 0 #f7d7ac;
+        }
+
+        .slot.filled {
+            background: #dcf5e5;
+            border-color: #6fbf4c;
+            box-shadow: 0 6px 0 #90c779;
+        }
+
+        .slot-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #b6682a;
+        }
+
+        .slot-digit {
+            font-size: 3.2rem;
+            font-weight: bold;
+            background: white;
+            display: inline-block;
+            width: 80px;
+            border-radius: 60px;
+            margin: 12px 0;
+            line-height: 1.2;
+            color: #e07c2c;
+        }
+
+        .slot .empty-place {
+            color: #ffc48a;
+            background: #ffefdf;
+        }
+
+        .drag-hint {
+            font-size: 0.7rem;
+            color: #c2773a;
+            margin-top: 5px;
+        }
+
+        /* 卡片区域 */
+        .cards-pool {
+            background: #fff0e2;
+            border-radius: 60px;
+            padding: 20px 15px;
+            margin: 20px 0 15px;
+        }
+
+        .cards-pool h4 {
+            text-align: center;
+            color: #f59e42;
+            margin-bottom: 18px;
+            font-size: 1.2rem;
+        }
+
+        .cards-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 14px;
+        }
+
+        .drag-card {
+            background: #ffd966;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.8rem;
+            font-weight: bold;
+            color: #9b4b1a;
+            box-shadow: 0 8px 0 #c27e3a;
+            cursor: grab;
+            transition: 0.05s linear;
+            touch-action: manipulation;
+            border: 2px solid #ffe1a0;
+        }
+
+        .drag-card:active {
+            cursor: grabbing;
+        }
+
+        /* 按钮区域 */
+        .buttons-bar {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            flex: 1;
+            background: #ffb156;
+            border: none;
+            font-size: 1.1rem;
+            font-weight: bold;
+            font-family: inherit;
+            padding: 12px 12px;
+            border-radius: 50px;
+            color: white;
+            cursor: pointer;
+            transition: 0.08s linear;
+            box-shadow: 0 5px 0 #9b541a;
+            text-align: center;
+        }
+
+        .btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 #9b541a;
+        }
+
+        .btn-reset {
+            background: #f5a65a;
+        }
+
+        .message-box {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 1rem;
+            font-weight: bold;
+            color: #e67e22;
+            min-height: 55px;
+            background: #fff7e8;
+            border-radius: 40px;
+            padding: 10px;
+        }
+
+        /* 响应式 */
+        @media (max-width: 780px) {
+            .flex-layout {
+                flex-direction: column;
+            }
+            .knowledge-side {
+                border-right: none;
+                border-bottom: 4px solid #ffe2bc;
+            }
+            .slot {
+                width: 120px;
+            }
+            .slot-digit {
+                font-size: 2.5rem;
+                width: 65px;
+            }
+            .drag-card {
+                width: 70px;
+                height: 70px;
+                font-size: 2.3rem;
+            }
+            .current-number {
+                font-size: 3rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .slot {
+                width: 105px;
+                padding: 12px 4px;
+            }
+            .slot-digit {
+                font-size: 2rem;
+                width: 55px;
+            }
+            .drag-card {
+                width: 60px;
+                height: 60px;
+                font-size: 2rem;
+            }
+        }
+
+        /* 胜利动画 */
+        .flash-win {
+            animation: winGlow 0.5s ease 2;
+        }
+
+        @keyframes winGlow {
+            0% { background-color: #fffef7; box-shadow: 0 0 0 0 #fbd38d; }
+            50% { background-color: #fff1b5; box-shadow: 0 0 0 12px rgba(251, 211, 141, 0.4); }
+            100% { background-color: #fffef7; box-shadow: 0 0 0 0 #fbd38d; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="lesson-box">
+    <div class="flex-layout">
+        <!-- 左侧知识点区域 -->
+        <div class="knowledge-side">
+            <h2>📖 千以内数字王国</h2>
+            <div class="place-card">
+                <h3>🏰 百位 · 十位 · 个位</h3>
+                <div class="big-number">例如：382</div>
+                <div class="digits-row">
+                    <div class="digit-unit"><div class="title">百位</div><div class="num">3</div><div style="font-size:12px;">=300</div></div>
+                    <div class="digit-unit"><div class="title">十位</div><div class="num">8</div><div style="font-size:12px;">=80</div></div>
+                    <div class="digit-unit"><div class="title">个位</div><div class="num">2</div><div style="font-size:12px;">=2</div></div>
+                </div>
+                <div style="font-weight:bold;">✨ 300+80+2=382 ✨</div>
+            </div>
+            <ul class="explain-list">
+                <li>🔢 一个三位数 = (百位数字×100) + (十位数字×10) + 个位数字</li>
+                <li>🎯 比如 506 → 百位5，十位0，个位6</li>
+                <li>🧸 如果数字不足百位，比如 78，百位就是0哦！</li>
+                <li>⭐ 把数字卡片拖拽到对应的“百位”“十位”“个位”篮子里，全部正确就能得分~</li>
+            </ul>
+        </div>
+
+        <!-- 右侧互动游戏区 -->
+        <div class="game-side" id="gameZone">
+            <div class="game-header">
+                <h3>🎲 数字组装工厂</h3>
+                <div class="score-panel" id="scoreDisplay">🏆 成功组装 0 次</div>
+            </div>
+            <div class="challenge-area">
+                <div class="challenge-label">🌟 挑战数字 🌟</div>
+                <div class="current-number" id="targetNumber">---</div>
+                <div class="drag-hint" style="margin-top: 8px;">💡 把下方数字卡片拖到对应数位框里！</div>
+            </div>
+
+            <!-- 三个数位放置槽 -->
+            <div class="slots-group">
+                <div class="slot" id="hundredsSlot" data-slot="hundreds">
+                    <div class="slot-title">🏅 百位</div>
+                    <div class="slot-digit empty-place" id="hundredsValue">?</div>
+                    <div class="drag-hint">拖拽数字 →</div>
+                </div>
+                <div class="slot" id="tensSlot" data-slot="tens">
+                    <div class="slot-title">🎈 十位</div>
+                    <div class="slot-digit empty-place" id="tensValue">?</div>
+                    <div class="drag-hint">拖拽数字 →</div>
+                </div>
+                <div class="slot" id="unitsSlot" data-slot="units">
+                    <div class="slot-title">🍎 个位</div>
+                    <div class="slot-digit empty-place" id="unitsValue">?</div>
+                    <div class="drag-hint">拖拽数字 →</div>
+                </div>
+            </div>
+
+            <!-- 可拖拽数字卡片池 0~9，可重复使用 -->
+            <div class="cards-pool">
+                <h4>📦 长按或拖动数字卡片 (可重复使用)</h4>
+                <div class="cards-grid" id="cardsContainer">
+                    <!-- 动态生成0-9卡片 -->
+                </div>
+            </div>
+
+            <div class="buttons-bar">
+                <button class="btn" id="nextBtn">🎲 下一题</button>
+                <button class="btn btn-reset" id="resetGameBtn">🔄 重置分数 & 游戏</button>
+            </div>
+            <div class="message-box" id="gameMessage"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ---------- 游戏核心 ----------
+    let currentNumber = 382;          // 当前题目数字 0-999
+    let currentHundreds = 3;
+    let currentTens = 8;
+    let currentUnits = 2;
+    
+    // 配对状态
+    let hundredPaired = false;
+    let tensPaired = false;
+    let unitsPaired = false;
+    
+    let successCount = 0;              // 完整拼对数字的次数
+    
+    // DOM 元素
+    const targetNumberSpan = document.getElementById('targetNumber');
+    const hundredsValueSpan = document.getElementById('hundredsValue');
+    const tensValueSpan = document.getElementById('tensValue');
+    const unitsValueSpan = document.getElementById('unitsValue');
+    const hundredsSlotDiv = document.getElementById('hundredsSlot');
+    const tensSlotDiv = document.getElementById('tensSlot');
+    const unitsSlotDiv = document.getElementById('unitsSlot');
+    const scoreDisplaySpan = document.getElementById('scoreDisplay');
+    const messageDiv = document.getElementById('gameMessage');
+    const nextBtn = document.getElementById('nextBtn');
+    const resetGameBtn = document.getElementById('resetGameBtn');
+    const cardsContainer = document.getElementById('cardsContainer');
+    
+    // 辅助: 显示短暂消息
+    function showMessage(msg, isError = false) {
+        messageDiv.innerHTML = msg;
+        messageDiv.style.color = isError ? '#e67e22' : '#3c9e3c';
+        setTimeout(() => {
+            if (messageDiv.innerHTML === msg) messageDiv.innerHTML = '';
+        }, 1800);
+    }
+    
+    // 更新计分板UI
+    function updateScoreUI() {
+        scoreDisplaySpan.innerText = `🏆 成功组装 ${successCount} 次`;
+    }
+    
+    // 刷新目标数字和内部的位值
+    function refreshTargetDisplay() {
+        targetNumberSpan.innerText = currentNumber;
+        currentHundreds = Math.floor(currentNumber / 100);
+        currentTens = Math.floor((currentNumber % 100) / 10);
+        currentUnits = currentNumber % 10;
+    }
+    
+    // 重置当前题目的配对状态 (不清分数，不清题目数字，仅重置三个槽位为未配对)
+    function resetSlotsState() {
+        hundredPaired = false;
+        tensPaired = false;
+        unitsPaired = false;
+        
+        // 清空槽位显示并恢复样式
+        hundredsValueSpan.innerText = '?';
+        tensValueSpan.innerText = '?';
+        unitsValueSpan.innerText = '?';
+        
+        hundredsValueSpan.classList.add('empty-place');
+        tensValueSpan.classList.add('empty-place');
+        unitsValueSpan.classList.add('empty-place');
+        
+        hundredsSlotDiv.classList.remove('filled');
+        tensSlotDiv.classList.remove('filled');
+        unitsSlotDiv.classList.remove('filled');
+        
+        // 确保槽位显示问号
+        hundredsValueSpan.style.color = '';
+        tensValueSpan.style.color = '';
+        unitsValueSpan.style.color = '';
+    }
+    
+    // 生成一个随机的千以内数字 (1~999, 偶尔包含0但为了教学0也算，但避免0太多，范围0~999)
+    function getRandomNumber() {
+        return Math.floor(Math.random() * 1000); // 0-999
+    }
+    
+    // 重置整个游戏 (新题目，重置配对，分数可选归零)
+    function resetGame(fullResetScore = true) {
+        if (fullResetScore) {
+            successCount = 0;
+            updateScoreUI();
+        }
+        // 随机生成新数字
+        currentNumber = getRandomNumber();
+        refreshTargetDisplay();
+        resetSlotsState();
+        showMessage('✨ 全新一局！把数字卡片拖到正确的数位框里吧 ✨', false);
+    }
+    
+    // 新题目 (保留分数，重置槽位，更换数字)
+    function nextQuestion() {
+        // 生成新数字，避免与当前完全一样（可选）
+        let newNum = getRandomNumber();
+        // 如果新数字和当前相同并且不是刻意追求不同，那就再随机一次
+        if (newNum === currentNumber) {
+            newNum = (newNum + 1) % 1000;
+        }
+        currentNumber = newNum;
+        refreshTargetDisplay();
+        resetSlotsState();
+        showMessage(`🎲 新题目来啦！拼出 ${currentNumber} 吧！`, false);
+    }
+    
+    // 检查三个槽位是否全部配对，若全对则增加分数，自动进入下一题
+    function checkAllPairedAndWin() {
+        if (hundredPaired && tensPaired && unitsPaired) {
+            // 完整拼对一个数字，增加成功次数
+            successCount++;
+            updateScoreUI();
+            // 胜利特效
+            const gamePanel = document.getElementById('gameZone');
+            gamePanel.classList.add('flash-win');
+            setTimeout(() => gamePanel.classList.remove('flash-win'), 600);
+            showMessage(`🎉🎉 完美！数字 ${currentNumber} 组装成功！ +1分 🎉🎉`, false);
+            // 自动进入下一题（保留分数）
+            let newNum = getRandomNumber();
+            if (newNum === currentNumber) newNum = (newNum + 1) % 1000;
+            currentNumber = newNum;
+            refreshTargetDisplay();
+            resetSlotsState();
+            showMessage(`🌟 新数字: ${currentNumber}，继续挑战吧！`, false);
+        }
+    }
+    
+    // 处理拖拽放置到某个数位槽
+    function setupDropTarget(slotElement, slotType) {
+        slotElement.addEventListener('dragover', (e) => {
+            e.preventDefault();   // 必须，允许放置
+        });
+        
+        slotElement.addEventListener('drop', (e) => {
+            e.preventDefault();
+            // 获取拖拽的数字
+            let draggedValue = null;
+            if (e.dataTransfer) {
+                const raw = e.dataTransfer.getData('text/plain');
+                if (raw && !isNaN(parseInt(raw))) {
+                    draggedValue = parseInt(raw);
+                }
+            }
+            // 兼容直接存储全局变量 (备用)
+            if (draggedValue === null && window._lastDragValue !== undefined) {
+                draggedValue = window._lastDragValue;
+            }
+            if (draggedValue === null || isNaN(draggedValue)) {
+                showMessage('请长按卡片再拖动哟~', true);
+                return;
+            }
+            
+            // 根据槽位获取预期数字
+            let expected = null;
+            let isPaired = false;
+            let slotName = "";
+            switch(slotType) {
+                case 'hundreds':
+                    expected = currentHundreds;
+                    isPaired = hundredPaired;
+                    slotName = "百位";
+                    break;
+                case 'tens':
+                    expected = currentTens;
+                    isPaired = tensPaired;
+                    slotName = "十位";
+                    break;
+                case 'units':
+                    expected = currentUnits;
+                    isPaired = unitsPaired;
+                    slotName = "个位";
+                    break;
+                default: return;
+            }
+            
+            // 检查是否已经配对过
+            if (isPaired) {
+                showMessage(`⛔ ${slotName} 已经配对成功啦！不能重复哦~`, true);
+                return;
+            }
+            
+            // 验证数字是否正确
+            if (draggedValue === expected) {
+                // 配对成功
+                if (slotType === 'hundreds') {
+                    hundredPaired = true;
+                    hundredsValueSpan.innerText = draggedValue;
+                    hundredsValueSpan.classList.remove('empty-place');
+                    hundredsSlotDiv.classList.add('filled');
+                } else if (slotType === 'tens') {
+                    tensPaired = true;
+                    tensValueSpan.innerText = draggedValue;
+                    tensValueSpan.classList.remove('empty-place');
+                    tensSlotDiv.classList.add('filled');
+                } else if (slotType === 'units') {
+                    unitsPaired = true;
+                    unitsValueSpan.innerText = draggedValue;
+                    unitsValueSpan.classList.remove('empty-place');
+                    unitsSlotDiv.classList.add('filled');
+                }
+                showMessage(`✅ 正确！${slotName} 应该是 ${draggedValue} ，好厉害！`, false);
+                // 检查是否三个槽位全部配对
+                checkAllPairedAndWin();
+            } else {
+                // 配对失败
+                showMessage(`❌ 不对哦！ ${draggedValue} 不等于 ${expected}，再观察一下 ${slotName} 应该是多少？`, true);
+                // 错误动画：晃动槽位
+                slotElement.style.transform = 'translateX(6px)';
+                setTimeout(() => { if(slotElement) slotElement.style.transform = ''; }, 200);
+            }
+        });
+    }
+    
+    // 生成可拖拽数字卡片 0~9
+    function renderCards() {
+        cardsContainer.innerHTML = '';
+        for (let i = 0; i <= 9; i++) {
+            const card = document.createElement('div');
+            card.className = 'drag-card';
+            card.setAttribute('draggable', 'true');
+            card.setAttribute('data-digit', i);
+            card.innerText = i;
+            
+            // drag 事件
+            card.addEventListener('dragstart', (e) => {
+                const digit = parseInt(card.getAttribute('data-digit'));
+                e.dataTransfer.setData('text/plain', digit.toString());
+                e.dataTransfer.effectAllowed = 'copy';
+                // 存储到全局变量作为备用
+                window._lastDragValue = digit;
+                // 拖拽时样式
+                card.style.opacity = '0.6';
+            });
+            card.addEventListener('dragend', (e) => {
+                card.style.opacity = '';
+                window._lastDragValue = null;
+            });
+            // 移动端增强: 防止touch时页面滚动, 并让长按能够触发drag
+            card.addEventListener('touchstart', (e) => {
+                // 原生drag在移动端需要长按，为了不干扰，只做一个小延迟保证触发drag，但不用额外处理
+                e.stopPropagation();
+            }, { passive: false });
+            cardsContainer.appendChild(card);
+        }
+    }
+    
+    // 初始化游戏
+    function initGame() {
+        // 随机初始数字 (1~999 有趣)
+        currentNumber = Math.floor(Math.random() * 990) + 10; // 10~999
+        if (currentNumber > 999) currentNumber = 527;
+        refreshTargetDisplay();
+        resetSlotsState();
+        successCount = 0;
+        updateScoreUI();
+        renderCards();
+        
+        // 设置三个槽位监听
+        setupDropTarget(hundredsSlotDiv, 'hundreds');
+        setupDropTarget(tensSlotDiv, 'tens');
+        setupDropTarget(unitsSlotDiv, 'units');
+        
+        showMessage('🎈 将数字卡片拖到对应的百位/十位/个位框里，全部正确就能得分！', false);
+    }
+    
+    // 按钮事件
+    nextBtn.addEventListener('click', () => {
+        nextQuestion();
+    });
+    
+    resetGameBtn.addEventListener('click', () => {
+        // 重置分数并且全新开始
+        successCount = 0;
+        updateScoreUI();
+        currentNumber = getRandomNumber();
+        refreshTargetDisplay();
+        resetSlotsState();
+        showMessage('✨ 分数已重置，重新开始挑战吧 ✨', false);
+    });
+    
+    // 启动一切
+    initGame();
+    
+    // 额外优化: 防止页面内默认拖拽图片
+    window.addEventListener('dragstart', (e) => {
+        if (!e.target.closest('.drag-card')) {
+            e.preventDefault();
+        }
+    });
+    
+    // 移动端touch优化: 确保drag过程中页面不会疯狂滚动
+    document.querySelectorAll('.drag-card').forEach(card => {
+        card.addEventListener('touchmove', (e) => {
+            // 轻微阻止避免页面滚动过多，但原生drag会处理，不需要完全prevent
+        }, { passive: false });
+    });
+</script>
+</body>
+</html>
